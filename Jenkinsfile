@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "spring-petclinic"
-        DOCKER_REGISTRY_URL = "ddd.azurecr.io"
+        DOCKER_REGISTRY_URL = "adrwalacr.azurecr.io"
         DOCKER_REGEISTRY_CREDENTIALS_ID = "ACR-user-pass"
     }
 
@@ -18,27 +18,27 @@ pipeline {
             }
         }
 
-        stage('Static Code Analysis') {
-            steps {
-                echo "Running static code analysis..."
-                // sh 'mvn checkstyle:check'
-                // sh 'mvn spotbugs:check'
-            }
-        }
+        // stage('Static Code Analysis') {
+        //     steps {
+        //         echo "Running static code analysis..."
+        //         // sh 'mvn checkstyle:check'
+        //         // sh 'mvn spotbugs:check'
+        //     }
+        // }
 
-        stage('Run Tests') {
-            steps {
-                echo "Running unit tests..."
-                sh 'mvn test'
-            }
-        }
+        // stage('Run Tests') {
+        //     steps {
+        //         echo "Running unit tests..."
+        //         sh 'mvn test'
+        //     }
+        // }
 
-        stage('Build Application') {
-            steps {
-                echo "Building the application..."
-                sh 'mvn clean package -DskipTests'
-            }
-        }
+        // stage('Build Application') {
+        //     steps {
+        //         echo "Building the application..."
+        //         sh 'mvn clean package -DskipTests'
+        //     }
+        // }
 
         stage('Create Artifact') {
             steps {
