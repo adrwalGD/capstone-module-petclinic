@@ -6,6 +6,10 @@ pipeline {
         REGISTRY = "ddd.azurecr.io"
     }
 
+    tools {
+        maven 'maven'
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
