@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                    def imageTag = "${REGISTRY}/${IMAGE_NAME}:${shortCommit}"
+                    def imageTag = "${DOCKER_REGISTRY_URL}/${IMAGE_NAME}:${shortCommit}"
                     env.IMAGE_TAG = imageTag
                     echo "Generated artifact tag: ${imageTag}"
                 }
