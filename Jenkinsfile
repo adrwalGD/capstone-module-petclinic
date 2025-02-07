@@ -3,7 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = "spring-petclinic"
-        REGISTRY = "ddd.azurecr.io"
+        DOCKER_REGISTRY_URL = "ddd.azurecr.io"
+        DOCKER_REGEISTRY_CREDENTIALS_ID = "ACR-user-pass"
     }
 
     tools {
@@ -61,7 +62,7 @@ pipeline {
         stage('Push Artifact to ACR') {
             steps {
                 script {
-                    docker.withRegistry('https://ddd.azurecr.io', 'ACR-user-pass') {
+                    docker.withRegistry(DOCKER_REGISTRY_URL, DOCKER_REGEISTRY_CREDENTIALS_ID) {
                         echo "Logging in to Azure Container Registry..."
                         sh "docker push ${IMAGE_TAG}"
                     }
