@@ -101,6 +101,7 @@ pipeline {
                 script {
                     def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache/pip'){
                         withEnv(["HOME=${env.WORKSPACE}"]) {
+                            sh 'export PATH=$PATH:~/.local/bin'
                             sh 'pwd'
                             sh 'ls -la'
                             sh 'pip install --no-cache-dir semver'
