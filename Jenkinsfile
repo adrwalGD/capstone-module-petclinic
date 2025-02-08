@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = "spring-petclinic"
-        // DOCKER_REGISTRY = "adrwalacr.azurecr.io"
-        // DOCKER_REGISTRY_URL = "https://adrwalacr.azurecr.io/"
+        AZURE_DOCKER_REGISTRY = "adrwalacr.azurecr.io"
+        AZURE_AZURE_DOCKER_REGISTRY_URL = "https://adrwalacr.azurecr.io/"
         DOCKER_REGEISTRY_CREDENTIALS_ID = "ACR-user-pass"
         GITHUB_SSH_CREDENTIALS_ID = "github-ssh"
         GITHUB_REPOSITORY = "git@github.com:adrwalGD/capstone-module-petclinic.git"
@@ -47,7 +47,7 @@ pipeline {
         //     steps {
         //         script {
         //             def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-        //             def imageTag = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}"
+        //             def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}"
         //             env.IMAGE_TAG = imageTag
         //             echo "Generated artifact tag: ${imageTag}"
         //         }
@@ -65,7 +65,7 @@ pipeline {
         // stage('Push Artifact to ACR') {
         //     steps {
         //         script {
-        //             docker.withRegistry(DOCKER_REGISTRY_URL, DOCKER_REGEISTRY_CREDENTIALS_ID) {
+        //             docker.withRegistry(AZURE_DOCKER_REGISTRY_URL, DOCKER_REGEISTRY_CREDENTIALS_ID) {
         //                 echo "Logging in to Azure Container Registry..."
         //                 dockerImage.push()
         //                 dockerImage.push("latest")
@@ -99,7 +99,7 @@ pipeline {
             }
             steps {
                 script {
-                    def tag = docker.image('python:3.8').inside {
+                    def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache'){
                         sh 'pip install semver'
                         def newTag = sh(script: 'python3 semver.py ${env.LATEST_TAG} minor', returnStdout: true).trim()
                         echo "New tag: ${newTag}"
