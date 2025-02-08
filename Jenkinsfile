@@ -101,11 +101,11 @@ pipeline {
                 script {
                     def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache/pip'){
                         withEnv(["HOME=${env.WORKSPACE}"]) {
-                            sh 'export PATH=$PATH:~/.local/bin'
-                            sh 'pwd'
-                            sh 'ls -la'
-                            sh 'pip list'
-                            sh 'which python3'
+                            // sh 'export PATH=$PATH:~/.local/bin'
+                            // sh 'pwd'
+                            // sh 'ls -la'
+                            // sh 'pip list'
+                            // sh 'which python3'
                             sh 'pip install --no-cache-dir semver'
                             def newTag = sh(script: "python3 semver_script.py ${env.LATEST_TAG} minor", returnStdout: true).trim()
                             echo "New tag: ${newTag}"
@@ -114,9 +114,6 @@ pipeline {
                     }
                     env.NEW_TAG = tag
                     echo "New tag: ${tag}"
-                    // def newTag = sh(script: 'python3 semver.py ${env.LATEST_TAG} minor', returnStdout: true).trim()
-                    // echo "New tag: ${newTag}"
-                    // env.NEW_TAG = newTag
                 }
             }
         }
