@@ -29,21 +29,20 @@ pipeline {
         //     }
         // }
 
-        // stage('Run Tests') {
-        //     steps {
-        //         echo "Running unit tests..."
-        //         sh 'mvn test'
-        //     }
-        // }
+        stage('Run Tests') {
+            steps {
+                echo "Running unit tests..."
+                sh 'mvn test'
+            }
+        }
 
-        // stage('Build Application') {
-        //     steps {
-        //         echo "Building the application..."
-        //         sh 'mvn clean package -DskipTests'
-        //     }
-        // }
+        stage('Build Application') {
+            steps {
+                echo "Building the application..."
+                sh 'mvn clean package -DskipTests'
+            }
+        }
 
-        // Create different tag when branch name is main
         stage('Create Artifact tag') {
             steps {
                 echo "Creating artifact tag..."
@@ -55,7 +54,6 @@ pipeline {
                             sh "git fetch --tags ${env.GITHUB_REPOSITORY}"
                             echo "fetched tags..."
                         }
-                        // script {
                         def latestTag = sh(script: 'git describe --tags `git rev-list --tags --max-count=1`', returnStdout: true).trim()
                         echo "Latest tag: ${latestTag}"
                         env.LATEST_TAG = latestTag
@@ -69,89 +67,43 @@ pipeline {
                             }
                         }
                         env.IMAGE_TAG = tag
-                        // }
                     } else {
                         def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                        def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}-pr"
+                        def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}"
                         env.IMAGE_TAG = imageTag
                     }
                     echo "Generated artifact tag: ${env.IMAGE_TAG}"
                 }
-                // script {
-                //     def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                //     def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}"
-                //     env.IMAGE_TAG = imageTag
-                //     echo "Generated artifact tag: ${imageTag}"
-                // }
             }
         }
 
-        // stage('Build Docker Image') {
-        //     steps {
-        //         script {
-        //             dockerImage = docker.build(env.IMAGE_TAG, ".")
-        //         }
-        //     }
-        // }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build(env.IMAGE_TAG, ".")
+                }
+            }
+        }
 
-        // stage('Push Artifact to ACR') {
-        //     steps {
-        //         script {
-        //             docker.withRegistry(AZURE_DOCKER_REGISTRY_URL, DOCKER_REGEISTRY_CREDENTIALS_ID) {
-        //                 echo "Logging in to Azure Container Registry..."
-        //                 dockerImage.push()
-        //                 dockerImage.push("latest")
-        //             }
-        //         }
-        //     }
-        // }
-
-        // stage('Get latest tag') {
-        //     when {
-        //         branch 'main'
-        //     }
-        //     steps {
-        //         sshagent([env.GITHUB_SSH_CREDENTIALS_ID]) {
-        //             sh "mkdir -p ~/.ssh"
-        //             sh "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
-        //             sh "git fetch --tags ${env.GITHUB_REPOSITORY}"
-        //             echo "fetched tags..."
-        //         }
-        //         script {
-        //             def latestTag = sh(script: 'git describe --tags `git rev-list --tags --max-count=1`', returnStdout: true).trim()
-        //             echo "Latest tag: ${latestTag}"
-        //             env.LATEST_TAG = latestTag
-        //         }
-        //     }
-        // }
-
-        // stage('Create new tag') {
-        //     when {
-        //         branch 'main'
-        //     }
-        //     steps {
-        //         script {
-        //             def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache/pip'){
-        //                 withEnv(["HOME=${env.WORKSPACE}"]) {
-        //                     sh 'pip install --no-cache-dir semver'
-        //                     def newTag = sh(script: "python3 semver_script.py ${env.LATEST_TAG} minor", returnStdout: true).trim()
-        //                     echo "New tag: ${newTag}"
-        //                     return newTag
-        //                 }
-        //             }
-        //             env.NEW_TAG = tag
-        //             echo "New tag: ${tag}"
-        //         }
-        //     }
-        // }
+        stage('Push Artifact to ACR') {
+            steps {
+                script {
+                    docker.withRegistry(AZURE_DOCKER_REGISTRY_URL, DOCKER_REGEISTRY_CREDENTIALS_ID) {
+                        echo "Logging in to Azure Container Registry..."
+                        dockerImage.push()
+                        dockerImage.push("latest")
+                    }
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo "PR pipeline completed successfully."
+            echo "Pipeline completed successfully."
         }
         failure {
-            echo "PR pipeline failed."
+            echo "Pipeline failed."
         }
     }
 }
