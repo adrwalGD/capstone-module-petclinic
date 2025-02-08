@@ -55,27 +55,27 @@ pipeline {
                             sh "git fetch --tags ${env.GITHUB_REPOSITORY}"
                             echo "fetched tags..."
                         }
-                        script {
-                            def latestTag = sh(script: 'git describe --tags `git rev-list --tags --max-count=1`', returnStdout: true).trim()
-                            echo "Latest tag: ${latestTag}"
-                            env.LATEST_TAG = latestTag
+                        // script {
+                        def latestTag = sh(script: 'git describe --tags `git rev-list --tags --max-count=1`', returnStdout: true).trim()
+                        echo "Latest tag: ${latestTag}"
+                        env.LATEST_TAG = latestTag
 
-                            def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache/pip'){
-                                withEnv(["HOME=${env.WORKSPACE}"]) {
-                                    sh 'pip install --no-cache-dir semver'
-                                    def newTag = sh(script: "python3 semver_script.py ${env.LATEST_TAG} minor", returnStdout: true).trim()
-                                    echo "New tag: ${newTag}"
-                                    return newTag
-                                }
+                        def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache/pip'){
+                            withEnv(["HOME=${env.WORKSPACE}"]) {
+                                sh 'pip install --no-cache-dir semver'
+                                def newTag = sh(script: "python3 semver_script.py ${env.LATEST_TAG} minor", returnStdout: true).trim()
+                                echo "New tag: ${newTag}"
+                                return newTag
                             }
-                            env.IMAGE_TAG = tag
                         }
+                        env.IMAGE_TAG = tag
+                        // }
                     } else {
                         def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                         def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}-pr"
                         env.IMAGE_TAG = imageTag
                     }
-                    echo "Generated artifact tag: ${imageTag}"
+                    echo "Generated artifact tag: ${env.IMAGE_TAG}"
                 }
                 // script {
                 //     def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
