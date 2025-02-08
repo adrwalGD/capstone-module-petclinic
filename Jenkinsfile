@@ -101,10 +101,11 @@ pipeline {
                 sh 'pip install semver'
                 script {
                     def tag = docker.image('python:3.8').inside {
-                        sh 'pip install semver'
-                        def newTag = sh(script: 'python3 semver.py ${env.LATEST_TAG} minor', returnStdout: true).trim()
-                        echo "New tag: ${newTag}"
-                        return newTag
+                        // sh 'pip install semver'
+                        // def newTag = sh(script: 'python3 semver.py ${env.LATEST_TAG} minor', returnStdout: true).trim()
+                        echo "New tag: ddddd"
+                        // return newTag
+                        return "dddd"
                     }
                     env.NEW_TAG = tag
                     echo "New tagDDD: ${tag}"
