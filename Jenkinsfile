@@ -7,6 +7,7 @@ pipeline {
         DOCKER_REGISTRY_URL = "https://adrwalacr.azurecr.io/"
         DOCKER_REGEISTRY_CREDENTIALS_ID = "ACR-user-pass"
         GITHUB_SSH_CREDENTIALS_ID = "github-ssh"
+        GITHUB_REPOSITORY = "git@github.com:adrwalGD/capstone-module-petclinic.git"
     }
 
     tools {
@@ -79,7 +80,7 @@ pipeline {
             }
             steps {
                 sshagent([env.GITHUB_SSH_CREDENTIALS_ID]) {
-                    sh 'git fetch --tags'
+                    sh "git fetch --tags ${env.GITHUB_REPOSITORY}"
                     echo "fetched tags..."
                 }
                 script {
