@@ -6,6 +6,7 @@ pipeline {
         DOCKER_REGISTRY = "adrwalacr.azurecr.io"
         DOCKER_REGISTRY_URL = "https://adrwalacr.azurecr.io/"
         DOCKER_REGEISTRY_CREDENTIALS_ID = "ACR-user-pass"
+        GITHUB_SSH_CREDENTIALS_ID = "github-ssh"
     }
 
     tools {
@@ -77,7 +78,10 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh 'git fetch --tags'
+                sshagent([env.GITHUB_SSH_CREDENTIALS_ID]) {
+                    sh 'git fetch --tags'
+                    echo "fetched tags..."
+                }
                 script {
                     def latestTag = sh(script: 'git describe --tags `git rev-list --tags --max-count=1`', returnStdout: true).trim()
                     echo "Latest tag: ${latestTag}"
