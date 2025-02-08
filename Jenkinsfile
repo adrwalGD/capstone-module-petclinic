@@ -63,6 +63,7 @@ pipeline {
                                 sh 'pip install --no-cache-dir semver'
                                 def newTag = sh(script: "python3 semver_script.py ${env.LATEST_TAG} minor", returnStdout: true).trim()
                                 echo "New tag: ${newTag}"
+                                sh 'rm -rf .local'
                                 return newTag
                             }
                         }
