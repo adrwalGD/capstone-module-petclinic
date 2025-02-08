@@ -41,7 +41,7 @@ pipeline {
         //     }
         // }
 
-        stage('Create Artifact') {
+        stage('Create Artifact tag') {
             steps {
                 script {
                     def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
@@ -65,7 +65,8 @@ pipeline {
                 script {
                     docker.withRegistry(DOCKER_REGISTRY_URL, DOCKER_REGEISTRY_CREDENTIALS_ID) {
                         echo "Logging in to Azure Container Registry..."
-                        sh "docker push ${IMAGE_TAG}"
+                        dockerImage.push()
+                        dockerImage.push("latest")
                     }
                 }
             }
