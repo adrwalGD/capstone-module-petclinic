@@ -104,6 +104,8 @@ pipeline {
                             sh 'export PATH=$PATH:~/.local/bin'
                             sh 'pwd'
                             sh 'ls -la'
+                            sh 'pip list'
+                            sh 'which python3'
                             sh 'pip install --no-cache-dir semver'
                             def newTag = sh(script: "python3 semver.py ${env.LATEST_TAG} minor", returnStdout: true).trim()
                             echo "New tag: ${newTag}"
