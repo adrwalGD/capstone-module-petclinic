@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = "spring-petclinic"
-        DOCKER_REGISTRY = "adrwalacr.azurecr.io"
-        DOCKER_REGISTRY_URL = "https://adrwalacr.azurecr.io/"
+        // DOCKER_REGISTRY = "adrwalacr.azurecr.io"
+        // DOCKER_REGISTRY_URL = "https://adrwalacr.azurecr.io/"
         DOCKER_REGEISTRY_CREDENTIALS_ID = "ACR-user-pass"
         GITHUB_SSH_CREDENTIALS_ID = "github-ssh"
         GITHUB_REPOSITORY = "git@github.com:adrwalGD/capstone-module-petclinic.git"
