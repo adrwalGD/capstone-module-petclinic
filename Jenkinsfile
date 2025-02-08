@@ -3,7 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = "spring-petclinic"
-        DOCKER_REGISTRY_URL = "adrwalacr.azurecr.io"
+        DOCKER_REGISTRY = "adrwalacr.azurecr.io"
+        DOCKER_REGISTRY_URL = "https://adrwalacr.azurecr.io/"
         DOCKER_REGEISTRY_CREDENTIALS_ID = "ACR-user-pass"
     }
 
@@ -44,7 +45,7 @@ pipeline {
             steps {
                 script {
                     def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                    def imageTag = "${DOCKER_REGISTRY_URL}/${IMAGE_NAME}:${shortCommit}"
+                    def imageTag = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}"
                     env.IMAGE_TAG = imageTag
                     echo "Generated artifact tag: ${imageTag}"
                 }
