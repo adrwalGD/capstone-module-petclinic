@@ -99,7 +99,7 @@ pipeline {
             }
             steps {
                 script {
-                    def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache'){
+                    def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache/pip'){
                         sh 'pip install semver'
                         def newTag = sh(script: 'python3 semver.py ${env.LATEST_TAG} minor', returnStdout: true).trim()
                         echo "New tag: ${newTag}"
