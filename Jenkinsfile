@@ -80,6 +80,7 @@ pipeline {
             }
             steps {
                 sshagent([env.GITHUB_SSH_CREDENTIALS_ID]) {
+                    sh "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
                     sh "git fetch --tags ${env.GITHUB_REPOSITORY}"
                     echo "fetched tags..."
                 }
