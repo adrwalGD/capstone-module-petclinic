@@ -41,33 +41,60 @@ pipeline {
         //     }
         // }
 
-        stage('Create Artifact tag') {
+        // stage('Create Artifact tag') {
+        //     steps {
+        //         script {
+        //             def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+        //             def imageTag = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}"
+        //             env.IMAGE_TAG = imageTag
+        //             echo "Generated artifact tag: ${imageTag}"
+        //         }
+        //     }
+        // }
+
+        // stage('Build Docker Image') {
+        //     steps {
+        //         script {
+        //             dockerImage = docker.build(env.IMAGE_TAG, ".")
+        //         }
+        //     }
+        // }
+
+        // stage('Push Artifact to ACR') {
+        //     steps {
+        //         script {
+        //             docker.withRegistry(DOCKER_REGISTRY_URL, DOCKER_REGEISTRY_CREDENTIALS_ID) {
+        //                 echo "Logging in to Azure Container Registry..."
+        //                 dockerImage.push()
+        //                 dockerImage.push("latest")
+        //             }
+        //         }
+        //     }
+        // }
+
+        stage('Get latest tag') {
+            when {
+                branch 'main'
+            }
             steps {
                 script {
-                    def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                    def imageTag = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}"
-                    env.IMAGE_TAG = imageTag
-                    echo "Generated artifact tag: ${imageTag}"
+                    def latestTag = sh(script: 'git describe --tags `git rev-list --tags --max-count=1`', returnStdout: true).trim()
+                    echo "Latest tag: ${latestTag}"
+                    env.LATEST_TAG = latestTag
                 }
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    dockerImage = docker.build(env.IMAGE_TAG, ".")
-                }
+        stage('Create new tag') {
+            when {
+                branch 'main'
             }
-        }
-
-        stage('Push Artifact to ACR') {
             steps {
+                sh 'pip install semver'
                 script {
-                    docker.withRegistry(DOCKER_REGISTRY_URL, DOCKER_REGEISTRY_CREDENTIALS_ID) {
-                        echo "Logging in to Azure Container Registry..."
-                        dockerImage.push()
-                        dockerImage.push("latest")
-                    }
+                    def newTag = sh(script: 'python3 semver.py ${env.LATEST_TAG} minor', returnStdout: true).trim()
+                    echo "New tag: ${newTag}"
+                    env.NEW_TAG = newTag
                 }
             }
         }
