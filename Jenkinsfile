@@ -98,17 +98,15 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh 'pip install semver'
                 script {
                     def tag = docker.image('python:3.8').inside {
-                        // sh 'pip install semver'
-                        // def newTag = sh(script: 'python3 semver.py ${env.LATEST_TAG} minor', returnStdout: true).trim()
-                        echo "New tag: ddddd"
-                        // return newTag
-                        return "dddd"
+                        sh 'pip install semver'
+                        def newTag = sh(script: 'python3 semver.py ${env.LATEST_TAG} minor', returnStdout: true).trim()
+                        echo "New tag: ${newTag}"
+                        return newTag
                     }
                     env.NEW_TAG = tag
-                    echo "New tagDDD: ${tag}"
+                    echo "New tag: ${tag}"
                     // def newTag = sh(script: 'python3 semver.py ${env.LATEST_TAG} minor', returnStdout: true).trim()
                     // echo "New tag: ${newTag}"
                     // env.NEW_TAG = newTag
