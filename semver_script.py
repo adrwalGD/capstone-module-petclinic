@@ -1,6 +1,4 @@
 import sys
-
-print(sys.path)
 import semver
 
 current_ver = sys.argv[1]

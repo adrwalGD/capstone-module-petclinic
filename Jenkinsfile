@@ -43,16 +43,48 @@ pipeline {
         //     }
         // }
 
-        // stage('Create Artifact tag') {
-        //     steps {
-        //         script {
-        //             def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-        //             def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}"
-        //             env.IMAGE_TAG = imageTag
-        //             echo "Generated artifact tag: ${imageTag}"
-        //         }
-        //     }
-        // }
+        // Create different tag when branch name is main
+        stage('Create Artifact tag') {
+            steps {
+                echo "Creating artifact tag..."
+                script {
+                    if (env.BRANCH_NAME == 'main') {
+                        sshagent([env.GITHUB_SSH_CREDENTIALS_ID]) {
+                            sh "mkdir -p ~/.ssh"
+                            sh "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
+                            sh "git fetch --tags ${env.GITHUB_REPOSITORY}"
+                            echo "fetched tags..."
+                        }
+                        script {
+                            def latestTag = sh(script: 'git describe --tags `git rev-list --tags --max-count=1`', returnStdout: true).trim()
+                            echo "Latest tag: ${latestTag}"
+                            env.LATEST_TAG = latestTag
+
+                            def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache/pip'){
+                                withEnv(["HOME=${env.WORKSPACE}"]) {
+                                    sh 'pip install --no-cache-dir semver'
+                                    def newTag = sh(script: "python3 semver_script.py ${env.LATEST_TAG} minor", returnStdout: true).trim()
+                                    echo "New tag: ${newTag}"
+                                    return newTag
+                                }
+                            }
+                            env.IMAGE_TAG = tag
+                        }
+                    } else {
+                        def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                        def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}-pr"
+                        env.IMAGE_TAG = imageTag
+                    }
+                    echo "Generated artifact tag: ${imageTag}"
+                }
+                // script {
+                //     def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                //     def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}"
+                //     env.IMAGE_TAG = imageTag
+                //     echo "Generated artifact tag: ${imageTag}"
+                // }
+            }
+        }
 
         // stage('Build Docker Image') {
         //     steps {
@@ -74,49 +106,44 @@ pipeline {
         //     }
         // }
 
-        stage('Get latest tag') {
-            when {
-                branch 'main'
-            }
-            steps {
-                sshagent([env.GITHUB_SSH_CREDENTIALS_ID]) {
-                    sh "mkdir -p ~/.ssh"
-                    sh "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
-                    sh "git fetch --tags ${env.GITHUB_REPOSITORY}"
-                    echo "fetched tags..."
-                }
-                script {
-                    def latestTag = sh(script: 'git describe --tags `git rev-list --tags --max-count=1`', returnStdout: true).trim()
-                    echo "Latest tag: ${latestTag}"
-                    env.LATEST_TAG = latestTag
-                }
-            }
-        }
+        // stage('Get latest tag') {
+        //     when {
+        //         branch 'main'
+        //     }
+        //     steps {
+        //         sshagent([env.GITHUB_SSH_CREDENTIALS_ID]) {
+        //             sh "mkdir -p ~/.ssh"
+        //             sh "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
+        //             sh "git fetch --tags ${env.GITHUB_REPOSITORY}"
+        //             echo "fetched tags..."
+        //         }
+        //         script {
+        //             def latestTag = sh(script: 'git describe --tags `git rev-list --tags --max-count=1`', returnStdout: true).trim()
+        //             echo "Latest tag: ${latestTag}"
+        //             env.LATEST_TAG = latestTag
+        //         }
+        //     }
+        // }
 
-        stage('Create new tag') {
-            when {
-                branch 'main'
-            }
-            steps {
-                script {
-                    def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache/pip'){
-                        withEnv(["HOME=${env.WORKSPACE}"]) {
-                            // sh 'export PATH=$PATH:~/.local/bin'
-                            // sh 'pwd'
-                            // sh 'ls -la'
-                            // sh 'pip list'
-                            // sh 'which python3'
-                            sh 'pip install --no-cache-dir semver'
-                            def newTag = sh(script: "python3 semver_script.py ${env.LATEST_TAG} minor", returnStdout: true).trim()
-                            echo "New tag: ${newTag}"
-                            return newTag
-                        }
-                    }
-                    env.NEW_TAG = tag
-                    echo "New tag: ${tag}"
-                }
-            }
-        }
+        // stage('Create new tag') {
+        //     when {
+        //         branch 'main'
+        //     }
+        //     steps {
+        //         script {
+        //             def tag = docker.image('python:3.8').inside('-v pip-cache:/.cache/pip'){
+        //                 withEnv(["HOME=${env.WORKSPACE}"]) {
+        //                     sh 'pip install --no-cache-dir semver'
+        //                     def newTag = sh(script: "python3 semver_script.py ${env.LATEST_TAG} minor", returnStdout: true).trim()
+        //                     echo "New tag: ${newTag}"
+        //                     return newTag
+        //                 }
+        //             }
+        //             env.NEW_TAG = tag
+        //             echo "New tag: ${tag}"
+        //         }
+        //     }
+        // }
     }
 
     post {
