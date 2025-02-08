@@ -77,6 +77,7 @@ pipeline {
                 branch 'main'
             }
             steps {
+                sh 'git fetch --tags'
                 script {
                     def latestTag = sh(script: 'git describe --tags `git rev-list --tags --max-count=1`', returnStdout: true).trim()
                     echo "Latest tag: ${latestTag}"
