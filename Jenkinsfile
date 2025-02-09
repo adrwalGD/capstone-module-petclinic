@@ -67,6 +67,7 @@ pipeline {
                                 return newTag
                             }
                         }
+                        env.GIT_TAG = tag
                         def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${tag}"
                         env.IMAGE_TAG = imageTag
                     } else {
@@ -106,8 +107,8 @@ pipeline {
             steps {
                 script {
                     sshagent([env.GITHUB_SSH_CREDENTIALS_ID]) {
-                        sh "git tag ${env.IMAGE_TAG}"
-                        sh "git push ${env.GITHUB_REPOSITORY} tag ${env.IMAGE_TAG}"
+                        sh "git tag ${env.GIT_TAG}"
+                        sh "git push ${env.GITHUB_REPOSITORY} tag ${env.GIT_TAG}"
                     }
                 }
             }
