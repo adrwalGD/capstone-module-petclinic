@@ -106,7 +106,7 @@ pipeline {
                 script {
                     sshagent([env.GITHUB_SSH_CREDENTIALS_ID]) {
                         sh "git tag ${env.IMAGE_TAG}"
-                        sh "git push origin tag ${env.IMAGE_TAG}"
+                        sh "git push ${env.GITHUB_REPOSITORY} tag ${env.IMAGE_TAG}"
                     }
                 }
             }
