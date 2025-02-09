@@ -67,7 +67,8 @@ pipeline {
                                 return newTag
                             }
                         }
-                        env.IMAGE_TAG = tag
+                        def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${tag}"
+                        env.IMAGE_TAG = imageTag
                     } else {
                         def shortCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                         def imageTag = "${AZURE_DOCKER_REGISTRY}/${IMAGE_NAME}:${shortCommit}"
