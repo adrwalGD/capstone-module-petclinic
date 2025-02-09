@@ -97,6 +97,20 @@ pipeline {
                 }
             }
         }
+
+        stage('Push git tag') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    sshagent([env.GITHUB_SSH_CREDENTIALS_ID]) {
+                        sh "git tag ${env.IMAGE_TAG}"
+                        sh "git push origin tag ${env.IMAGE_TAG}"
+                    }
+                }
+            }
+        }
     }
 
     post {
