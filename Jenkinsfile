@@ -88,6 +88,7 @@ pipeline {
             }
         }
 
+
         stage('Push Artifact to ACR') {
             steps {
                 script {
