@@ -21,13 +21,14 @@ pipeline {
             }
         }
 
-        // stage('Static Code Analysis') {
-        //     steps {
-        //         echo "Running static code analysis..."
-        //         // sh 'mvn checkstyle:check'
-        //         // sh 'mvn spotbugs:check'
-        //     }
-        // }
+        stage('Static Code Analysis') {
+            steps {
+                echo "Running static code analysis..."
+                sh 'mvn checkstyle:checkstyle'
+                // sh 'mvn checkstyle:check' // Commented because code base contains a lot of checkstyle errors
+                // sh 'mvn spotbugs:check' // Commented because code base contains a lot of spotbugs:check errors
+            }
+        }
 
         stage('Run Tests') {
             steps {
